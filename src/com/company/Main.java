@@ -4,6 +4,7 @@ import com.sun.security.jgss.GSSUtil;
 
 import javax.sound.midi.Soundbank;
 import javax.swing.*;
+import java.util.InputMismatchException;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -15,17 +16,18 @@ public class Main {
     public static void main(String[] args) {
         String answer;
         do {
+            System.out.println("What you name");
+            String Name =scan.next();
 
             int myNum = rand.nextInt(100) + 1;
             System.out.println(myNum);
             boolean userwon = false;
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 1; i < 11; i++) {
                 int userNum = askint("Enter you number from 1 to 100", 1, 100);
 
-
                 if (userNum == myNum) {
-                    System.out.println("molodec");
+                    System.out.println(Name +" Molodec Ti ugodal s " + i + " popitki");
                     userwon = true;
                     break;
 
@@ -46,10 +48,15 @@ public class Main {
 
     static int askint(String msg, int min, int max) {
         while (true) {
-            System.out.println(msg);
-            int answer = scan.nextInt();
-            if (answer >= min && answer <= max) {
-                return answer;
+            try {
+                System.out.println(msg);
+                int answer = scan.nextInt();
+                if (answer >= min && answer <= max) {
+                    return answer;
+                }
+            } catch (InputMismatchException ex){
+                System.out.println("Its not a NUMBER");
+                scan.next();
             }
             System.out.printf("please enter currekt from %d to %d\n", min, max);
 
