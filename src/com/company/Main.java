@@ -4,31 +4,37 @@ import com.sun.security.jgss.GSSUtil;
 
 import javax.sound.midi.Soundbank;
 import javax.swing.*;
-import java.util.InputMismatchException;
-import java.util.Random;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
     static Scanner scan = new Scanner(System.in);
     static Random rand = new Random();
-
+    static ArrayList<GameResult> users = new ArrayList<>();
 
     public static void main(String[] args) {
         String answer;
         do {
+
             System.out.println("What you name");
             String Name =scan.next();
-
+            long t1 =System.currentTimeMillis();
             int myNum = rand.nextInt(100) + 1;
             System.out.println(myNum);
             boolean userwon = false;
 
             for (int i = 1; i < 11; i++) {
+
                 int userNum = askint("Enter you number from 1 to 100", 1, 100);
 
                 if (userNum == myNum) {
                     System.out.println(Name +" Molodec Ti ugodal s " + i + " popitki");
                     userwon = true;
+                    long t2= System.currentTimeMillis();
+                    GameResult r = new GameResult();
+                    r.name = Name;
+                    r.trisCount = i;
+                    r.time =t2 - t1;
+                    users.add(r);
                     break;
 
                 } else if (userNum > myNum) {
@@ -42,6 +48,12 @@ public class Main {
             }
 
         } while (askWord("Do you ready for next round? yes or no"));
+
+        users.sort(Comparator.comparing (r -> r.trisCount));
+
+        for (GameResult result : users) {
+            System.out.printf("%s \t\t\t %d \t\t\t %d\n" , result.name, result.trisCount, result.time/1000);
+        }
 
         System.out.println("goodbaiii");
     }
@@ -59,7 +71,6 @@ public class Main {
                 scan.next();
             }
             System.out.printf("please enter currekt from %d to %d\n", min, max);
-
 
         }
 
