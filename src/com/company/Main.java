@@ -4,6 +4,9 @@ import com.sun.security.jgss.GSSUtil;
 
 import javax.sound.midi.Soundbank;
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Main {
@@ -13,10 +16,12 @@ public class Main {
 
     public static void main(String[] args) {
         String answer;
+        LoadResults();
+
         do {
 
             System.out.println("What you name");
-            String Name =scan.next();
+            String name =scan.next();
             long t1 =System.currentTimeMillis();
             int myNum = rand.nextInt(100) + 1;
             System.out.println(myNum);
@@ -27,13 +32,13 @@ public class Main {
                 int userNum = askint("Enter you number from 1 to 100", 1, 100);
 
                 if (userNum == myNum) {
-                    System.out.println(Name +" Molodec Ti ugodal s " + i + " popitki");
+                    System.out.println(name +" Molodec Ti ugodal s " + i + " popitki");
                     userwon = true;
                     long t2= System.currentTimeMillis();
                     GameResult r = new GameResult();
-                    r.name = Name;
-                    r.trisCount = i;
-                    r.time =t2 - t1;
+                    r.setName(name);
+                    r.setTrisCount(i);
+                    r.setTime(t2 - t1);
                     users.add(r);
                     break;
 
@@ -49,14 +54,76 @@ public class Main {
 
         } while (askWord("Do you ready for next round? yes or no"));
 
-        users.sort(Comparator.comparing (r -> r.trisCount));
+        showResults2();
 
-        for (GameResult result : users) {
-            System.out.printf("%s \t\t\t %d \t\t\t %d\n" , result.name, result.trisCount, result.time/1000);
-        }
 
         System.out.println("goodbaiii");
+
+        File file = new File ("myfile.txt");
+        try (PrintWriter out = new PrintWriter(file)){
+            for (GameResult result : users) {
+                    out.printf("%s %d %d\n",
+                            result.getName(),
+                            result.getTrisCount(),
+                            result.getTime());
+                }
+
+        } catch(IOException e){
+            System.out.println("Someting go wrong!");
+
+        }
+
     }
+
+    private static void LoadResults() {
+        File file = new File ("myfile.txt");
+        try (Scanner in = new Scanner(file)){
+            while (in.hasNext()){
+                GameResult r =new GameResult();
+                String name = in.next();
+                int trisCound = in.nextInt();
+                long time = in.nextLong();
+                r.setName(name);
+                r.setTrisCount(trisCound);
+                r.setTime(time);
+
+                users.add(r);
+            }
+
+        }catch (IOException e) {
+            System.out.println("NO NO no load");
+        }
+
+    }
+
+
+    private static void showResults() {
+        users.sort(Comparator
+                            .comparing (GameResult::getTrisCount)
+                            .thenComparing(GameResult::getTime));
+
+        for (GameResult result : users) {
+            System.out.printf("%s \t\t\t %d \t\t\t %d\n" ,
+                        result.getName(),
+                        result.getTrisCount(),
+                        result.getTime()/1000);
+        }
+    }
+
+    private static void showResults2() {
+        users.stream()
+                .sorted(Comparator
+                        .comparing (GameResult::getTrisCount)
+                        .thenComparing(GameResult::getTime))
+                .limit(2)
+                .forEach(r -> System.out.printf("%s \t\t\t %d \t\t\t %d\n" ,
+                        r.getName(),
+                        r.getTrisCount(),
+                        r.getTime()/1000));
+    }
+
+
+
 
     static int askint(String msg, int min, int max) {
         while (true) {
@@ -76,6 +143,7 @@ public class Main {
 
     }
 
+
     static boolean askWord (String msg) {
         while (true) {
             System.out.println(msg);
@@ -89,4 +157,6 @@ public class Main {
             System.out.println("Write yes or no");
         }
     }
+
+
 }
